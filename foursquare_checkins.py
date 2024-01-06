@@ -61,21 +61,24 @@ def clean_config_value(value):
 if __name__ == '__main__':
     offset = 0
     limit = 100
-    jsonfile = None
+    jsonlinesfile = None
     afterTimestamp = 0
     
     aparser = argparse.ArgumentParser()
-    aparser.add_argument('--jsonfile','-j',dest='jsonfile')
+    aparser.add_argument('--jsonlinesfile',"-j",dest='jsonlinesfile',
+                         help="JSON lines file")
     aparser.add_argument('--new',action='store_true',dest='newfile',
-                         help="create a new json file")
+                         help="create a new JSON lines file")
+    aparser.add_argument('--exportjson',action='store_true',dest='exportjson',
+                         help="export real JSON file")
     aparser.add_argument('--exportcsv',action='store_true',dest='exportcsv')
     aparser.add_argument('--config',dest='configfile')
     args = aparser.parse_args()
-    if (not args.jsonfile):
+    if (not args.jsonlinesfile):
         aparser.print_help()
         sys.exit()
     else:
-        jsonfile = args.jsonfile
+        jsonlinesfile = args.jsonlinesfile
         pass
 
     if (args.configfile):
@@ -112,11 +115,16 @@ if __name__ == '__main__':
     if (args.exportcsv):
         csvwriter.writerow(columns)
         pass
+    if (args.exportjson):
+        jsonout = sys.stdout
+        jsonitems = []
+        pass
+    
     try:
-        f = open(jsonfile,"r")
+        f = open(jsonlinesfile,"r")
     except FileNotFoundError:
         if (not args.newfile):
-            print(f"File {jsonfile} not found. aborting")
+            print(f"File {jsonlinesfile} not found. aborting")
             sys.exit(1)
             pass
     else:
@@ -126,6 +134,9 @@ if __name__ == '__main__':
             createdAt = item['createdAt']
             if (createdAt>afterTimestamp):
                 afterTimestamp = createdAt
+                pass
+            if (args.exportjson):
+                jsonitems.append(item)
                 pass
             if (args.exportcsv):
                 vals = []
@@ -155,9 +166,14 @@ if __name__ == '__main__':
             pass
         f.close()
         pass
+
+    if (args.exportjson):
+        json.dump(jsonitems,jsonout)
+        sys.exit(0)
     if (args.exportcsv):
         sys.exit(0)
-    #afterTimestamp = 1704215344
+        pass
+    afterTimestamp = 1704215344
     #afterTimestamp = 1703362182
     r = get_checkins(offset,1,afterTimestamp)
     rate_limit = r.headers["X-RateLimit-Limit"]
@@ -198,7 +214,7 @@ if __name__ == '__main__':
         pass
     if (len(newitems)>0):
         newitems.reverse()
-        f = open(jsonfile,"a")
+        f = open(jsonlinesfile,"a")
         for item in newitems:
             # remove stuff we don't care about
             clean_checkin(item)

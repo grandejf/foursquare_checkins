@@ -23,10 +23,16 @@ If there is a trailing "-0", remove it when copying it into the config file.
 cd "$(dirname "$0")"
 
 CONFIGFILE="foursquare.cfg"
+JSONLINESFILE="foursquare_checkins.jsonlines"
 JSONFILE="foursquare_checkins.json"
 CSVFILE="foursquare_checkins.csv"
 
-./foursquare_checkins.py --config "$CONFIGFILE" --new -j "$JSONFILE"
-./foursquare_checkins.py -j "$JSONFILE" --exportcsv > "$CSVFILE"
+./foursquare_checkins.py --config "$CONFIGFILE" --new --j "$JSONLINESFILE"
+./foursquare_checkins.py -j "$JSONLINESFILE" --exportjson > "$JSONFILE"
+./foursquare_checkins.py -j "$JSONLINESFILE" --exportcsv > "$CSVFILE"
+
+cp -p "$JSONLINESFILE" ~/Dropbox/Foursquare/
+cp -p "$JSONFILE" ~/Dropbox/Foursquare/
+cp -p "$CSVFILE" ~/Dropbox/Foursquare/
 
 ~~~
