@@ -173,7 +173,7 @@ if __name__ == '__main__':
     if (args.exportcsv):
         sys.exit(0)
         pass
-    afterTimestamp = 1704215344
+    #afterTimestamp = 1704215344
     #afterTimestamp = 1703362182
     r = get_checkins(offset,1,afterTimestamp)
     rate_limit = r.headers["X-RateLimit-Limit"]
