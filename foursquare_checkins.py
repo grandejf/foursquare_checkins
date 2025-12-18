@@ -10,6 +10,8 @@ import re
 
 import csv
 import json
+import hashlib
+import copy
 
 import argparse
 import configparser
@@ -120,6 +122,8 @@ if __name__ == '__main__':
         jsonitems = []
         pass
     
+    seen = {}
+    
     try:
         f = open(jsonlinesfile,"r")
     except FileNotFoundError:
@@ -130,7 +134,14 @@ if __name__ == '__main__':
     else:
         afterTimestamp = 0
         for line in f:
+            line = line.rstrip()
             item = json.loads(line)
+            item_hash = hashlib.md5(line.encode('utf-8')).hexdigest()
+            if (item['id'] in seen):
+                if (seen[item['id']]==item_hash):
+                    next
+                pass
+            seen[item['id']] = item_hash
             createdAt = item['createdAt']
             if (createdAt>afterTimestamp):
                 afterTimestamp = createdAt
@@ -204,6 +215,15 @@ if __name__ == '__main__':
                 date = time.strftime("%Y/%m/%d %H:%M:%S",date)
                 # add nice date
                 item['niceDate'] = date
+                item_copy = copy.deepcopy(item)
+                clean_checkin(item_copy)
+                line = json.dumps(item_copy)
+                item_hash = hashlib.md5(line.encode('utf-8')).hexdigest()
+                if (item['id'] in seen):
+                    if (seen[item['id']]==item_hash):
+                        continue
+                    pass
+                seen[item['id']] = item_hash                
                 newitems.append(item)
                 #csvwriter.writerow([date,name,lat,lng])
                 pass
