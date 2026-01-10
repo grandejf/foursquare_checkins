@@ -39,11 +39,11 @@ def get_checkins(offset,limit,afterTimestamp=0):
     return requests.get(url)
 
 def clean_checkin(item):
-    for key in ["canonicalUrl","canonicalPath"]:
+    for key in ["canonicalUrl","canonicalPath","editableUntil"]:
         item.pop(key,"")
         pass
     venue = item["venue"]
-    for key in ["contact","allowMenuUrlEdit","menu","deliveryProviders","delivery","reservations"]:
+    for key in ["contact","allowMenuUrlEdit","menu","deliveryProviders","delivery","reservations","stats"]:
         venue.pop(key,"")
         pass
     location = venue["location"]
@@ -136,6 +136,9 @@ if __name__ == '__main__':
         for line in f:
             line = line.rstrip()
             item = json.loads(line)
+            item_copy = copy.deepcopy(item)
+            clean_checkin(item_copy)
+            line = json.dumps(item_copy)
             item_hash = hashlib.md5(line.encode('utf-8')).hexdigest()
             if (item['id'] in seen):
                 if (seen[item['id']]==item_hash):
