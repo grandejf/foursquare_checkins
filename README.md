@@ -1,5 +1,14 @@
 # foursquare_checkins
 
+## Requirements
+
+Requests library
+
+~~~
+pip3 install requests --user
+~~~
+
+
 ## Instructions
 Create a config file called something like foursquare.cfg that looks like:
 
